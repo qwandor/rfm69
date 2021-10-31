@@ -76,17 +76,29 @@ fn main() -> Result<()> {
     let mut buffer = [0; 64];
     rfm_error!(rfm.recv(&mut buffer))?;
     // Print received data
+    let mut zerocount = 0;
     for val in buffer.iter() {
-        print!("{:02x} ", val);
         if *val == 0 {
-            println!();
+            zerocount += 1;
+        } else {
+            if zerocount > 0 {
+                println!("00*{}", zerocount);
+                zerocount = 0;
+            }
+            print!("{:02x} ", val);
         }
     }
     println!();
+    zerocount = 0;
     for val in buffer.iter() {
-        print!("{:08b} ", val);
         if *val == 0 {
-            println!();
+            zerocount += 1;
+        } else {
+            if zerocount > 0 {
+                println!("00*{}", zerocount);
+                zerocount = 0;
+            }
+            print!("{:08b} ", val);
         }
     }
     println!();
