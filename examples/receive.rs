@@ -28,6 +28,7 @@ fn main() -> Result<()> {
 
     rfm_error!(rfm.frequency(433_850_000.0))?;
     rfm_error!(rfm.bit_rate(3_000.0))?;
+    rfm_error!(rfm.rssi_threshold(220))?;
     rfm_error!(rfm.preamble(0))?;
     rfm_error!(rfm.sync(&[]))?;
 
