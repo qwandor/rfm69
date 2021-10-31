@@ -396,7 +396,7 @@ where
             "irq_flags: {:#02x} {:#02x}, RSSI={}",
             irq_flags_1, irq_flags_2, rssi
         );
-        Ok(irq_flags_2 & 0x04 != 0)
+        Ok(irq_flags_2 & 0x84 != 0)
     }
 
     /// Configure LNA in corresponding register `RegLna (0x18)`.
