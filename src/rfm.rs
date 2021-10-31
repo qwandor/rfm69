@@ -331,7 +331,7 @@ where
             "irq_flags: {:#02x} {:#02x}, RSSI={}",
             irq_flags_1, irq_flags_2, rssi
         );
-        Ok(irq_flags_2 & IrqFlags2::PayloadReady != 0)
+        Ok((irq_flags_2 & IrqFlags2::PayloadReady) | (irq_flags_2 & IrqFlags2::FifoFull) != 0)
     }
 
     /// Check if IRQ flag ModeReady is set.
