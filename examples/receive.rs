@@ -54,7 +54,7 @@ fn main() -> Result<()> {
         shaping: ModulationShaping::Shaping00,
     }))?;
     rfm_error!(rfm.packet(PacketConfig {
-        format: PacketFormat::Fixed(10),
+        format: PacketFormat::Fixed(0),
         dc: PacketDc::None,
         filtering: PacketFiltering::None,
         crc: false,
