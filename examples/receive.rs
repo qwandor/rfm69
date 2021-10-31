@@ -46,7 +46,7 @@ fn main() -> Result<()> {
     //rfm_error!(rfm.rx_bw(0x55))?;
     //rfm_error!(rfm.rx_afc_bw(0x8b))?;
     rfm_error!(rfm.preamble(0))?;
-    rfm_error!(rfm.sync(&[]))?;
+    rfm_error!(rfm.sync(&[0x8e]))?;
 
     rfm_error!(rfm.modulation(Modulation {
         data_mode: DataMode::Packet,
