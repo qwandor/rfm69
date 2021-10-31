@@ -25,7 +25,7 @@
 //! - [Product page](https://www.hoperf.com/modules/rf_transceiver/RFM69HCW.html)
 //! - [Datasheet](https://www.hoperf.com/data/upload/portal/20190307/RFM69HCW-V1.1.pdf)
 
-#![cfg_attr(not(test), no_std)]
+//#![cfg_attr(not(test), no_std)]
 
 use embedded_hal::blocking::delay::DelayMs;
 use embedded_hal::blocking::spi::{Operation, Transactional};
@@ -389,7 +389,14 @@ where
 
     /// Check if IRQ flag PacketReady is set.
     pub fn is_packet_ready(&mut self) -> Result<bool, Ecs, Espi> {
-        Ok(self.read(Registers::IrqFlags2)? & 0x04 != 0)
+        let irq_flags_1 = self.read(Registers::IrqFlags2)?;
+        let irq_flags_2 = self.read(Registers::IrqFlags2)?;
+        let rssi = self.read(Registers::RssiValue)? as f32 / -2.0;
+        println!(
+            "irq_flags: {:#02x} {:#02x}, RSSI={}",
+            irq_flags_1, irq_flags_2, rssi
+        );
+        Ok(irq_flags_2 & 0x04 != 0)
     }
 
     /// Configure LNA in corresponding register `RegLna (0x18)`.
