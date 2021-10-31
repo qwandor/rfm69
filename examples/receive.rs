@@ -33,10 +33,6 @@ fn main() -> Result<()> {
     // Create rfm struct with defaults that are set after reset
     let mut rfm = Rfm69::new_without_cs(spi, Delay);
 
-    // Print content of all RFM registers
-    for (index, val) in rfm_error!(rfm.read_all_regs())?.iter().enumerate() {
-        //println!("Register 0x{:02x} = 0x{:02x}", index + 1, val);
-    }
 
     rfm_error!(rfm.frequency(433_850_000.0))?;
     rfm_error!(rfm.bit_rate(3_000.0))?;
