@@ -4,12 +4,13 @@ use linux_embedded_hal::spidev::{SpiModeFlags, SpidevOptions};
 use linux_embedded_hal::sysfs_gpio::Direction;
 use linux_embedded_hal::{Delay, Spidev, SysfsPin};
 use rfm69::registers::{
-    DataMode, DioMapping, DioMode, DioPin, DioType, InterPacketRxDelay, Modulation,
+    DataMode, DioMapping, DioMode, DioPin, DioType, FifoMode, InterPacketRxDelay, Mode, Modulation,
     ModulationShaping, ModulationType, PacketConfig, PacketDc, PacketFiltering, PacketFormat,
+    Registers,
 };
-use std::time::Duration;
-use std::thread::sleep;
 use rfm69::Rfm69;
+use std::thread::sleep;
+use std::time::Duration;
 use utilities::rfm_error;
 
 fn main() -> Result<()> {
@@ -33,7 +34,6 @@ fn main() -> Result<()> {
     // Create rfm struct with defaults that are set after reset
     let mut rfm = Rfm69::new_without_cs(spi, Delay);
 
-
     rfm_error!(rfm.frequency(433_850_000.0))?;
     rfm_error!(rfm.bit_rate(3_000.0))?;
     // TODO: Configure automatic frequency correction
@@ -43,6 +43,7 @@ fn main() -> Result<()> {
     //rfm_error!(rfm.rx_afc_bw(0x8b))?;
     rfm_error!(rfm.preamble(0))?;
     rfm_error!(rfm.sync(&[0x8e]))?;
+    rfm_error!(rfm.fifo_mode(FifoMode::Level(2)))?;
 
     rfm_error!(rfm.modulation(Modulation {
         data_mode: DataMode::Packet,
@@ -50,7 +51,7 @@ fn main() -> Result<()> {
         shaping: ModulationShaping::Shaping00,
     }))?;
     rfm_error!(rfm.packet(PacketConfig {
-        format: PacketFormat::Fixed(14),
+        format: PacketFormat::Fixed(0),
         dc: PacketDc::None,
         filtering: PacketFiltering::None,
         crc: false,
@@ -68,33 +69,31 @@ fn main() -> Result<()> {
         dio_mode: DioMode::Rx,
     }))?;
 
-    // Prepare buffer to store the received data
-    let mut buffer = [0; 64];
-    rfm_error!(rfm.recv(&mut buffer))?;
-    // Print received data
+    rfm_error!(rfm.mode(Mode::Receiver))?;
+    rfm_error!(rfm.wait_mode_ready())?;
     let mut zerocount = 0;
-    for val in buffer.iter() {
-        if *val == 0 {
-            zerocount += 1;
-        } else {
-            if zerocount > 0 {
-                println!("00*{}", zerocount);
-                zerocount = 0;
+    loop {
+        //let irq_flags_1 = rfm_error!(rfm.read(Registers::IrqFlags1))?;
+        let irq_flags_2 = rfm_error!(rfm.read(Registers::IrqFlags2))?;
+        //let rssi = rfm_error!(rfm.read(Registers::RssiValue))? as f32 / -2.0;
+        /*println!(
+            "irq_flags: {:#02x} {:#02x}, RSSI={}",
+            irq_flags_1, irq_flags_2, rssi
+        );*/
+        if irq_flags_2 & 0x20 != 0 {
+            let val = rfm_error!(rfm.read(Registers::Fifo))?;
+            if val == 0 {
+                zerocount += 1;
+            } else {
+                if zerocount > 0 {
+                    println!("00*{}", zerocount);
+                    if zerocount >= 3 {
+                        break;
+                    }
+                    zerocount = 0;
+                }
+                print!("{:02x} ", val);
             }
-            print!("{:02x} ", val);
-        }
-    }
-    println!();
-    zerocount = 0;
-    for val in buffer.iter() {
-        if *val == 0 {
-            zerocount += 1;
-        } else {
-            if zerocount > 0 {
-                println!("00*{}", zerocount);
-                zerocount = 0;
-            }
-            print!("{:08b} ", val);
         }
     }
     println!();

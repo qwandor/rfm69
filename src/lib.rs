@@ -500,7 +500,7 @@ where
         self.write(Registers::IrqFlags2, 0x10)
     }
 
-    fn wait_mode_ready(&mut self) -> Result<(), Ecs, Espi> {
+    pub fn wait_mode_ready(&mut self) -> Result<(), Ecs, Espi> {
         self.with_timeout(100, 5, |rfm| {
             Ok((rfm.read(Registers::IrqFlags1)? & 0x80) != 0)
         })
