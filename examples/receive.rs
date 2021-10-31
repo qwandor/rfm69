@@ -46,12 +46,12 @@ fn main() -> Result<()> {
     }))?;
     rfm_error!(rfm.dio_mapping(DioMapping {
         pin: DioPin::Dio2,
-        dio_type: DioType::Dio01,
+        dio_type: DioType::Dio01, // Data
         dio_mode: DioMode::Rx,
     }))?;
     rfm_error!(rfm.dio_mapping(DioMapping {
-        pin: DioPin::Dio5,
-        dio_type: DioType::Dio00,
+        pin: DioPin::Dio3,
+        dio_type: DioType::Dio01, // RSSI
         dio_mode: DioMode::Rx,
     }))?;
 
