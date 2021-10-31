@@ -76,9 +76,20 @@ fn main() -> Result<()> {
     let mut buffer = [0; 64];
     rfm_error!(rfm.recv(&mut buffer))?;
     // Print received data
-    for (index, val) in buffer.iter().enumerate() {
-        println!("Value at {} = {}", index, val);
+    for val in buffer.iter() {
+        print!("{:02x} ", val);
+        if *val == 0 {
+            println!();
+        }
     }
+    println!();
+    for val in buffer.iter() {
+        print!("{:08b} ", val);
+        if *val == 0 {
+            println!();
+        }
+    }
+    println!();
 
     Ok(())
 }
