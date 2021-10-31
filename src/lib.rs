@@ -279,7 +279,9 @@ where
         self.mode(Mode::Receiver)?;
         self.wait_mode_ready()?;
 
-        while !self.is_packet_ready()? {}
+        while !self.is_packet_ready()? {
+            std::thread::sleep(std::time::Duration::from_millis(1));
+        }
 
         self.mode(Mode::Standby)?;
         self.read_many(Registers::Fifo, buffer)?;
