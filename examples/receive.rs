@@ -1,6 +1,8 @@
 use anyhow::Result;
+use embedded_hal::digital::v2::OutputPin;
+use linux_embedded_hal::gpio_cdev::{Chip, LineRequestFlags};
 use linux_embedded_hal::spidev::{SpiModeFlags, SpidevOptions};
-use linux_embedded_hal::SpidevDevice;
+use linux_embedded_hal::{CdevPin, SpidevDevice};
 use rfm69::registers::{
     DataMode, DioMapping, DioMode, DioPin, DioType, InterPacketRxDelay, Modulation,
     ModulationShaping, ModulationType, PacketConfig, PacketDc, PacketFiltering, PacketFormat,
@@ -9,6 +11,11 @@ use rfm69::Rfm69;
 use utilities::rfm_error;
 
 fn main() -> Result<()> {
+    let mut gpio = Chip::new("/dev/gpiochip0")?;
+    let mut reset = gpio.get_line(25)?;
+    let mut reset = CdevPin::new(reset.request(LineRequestFlags::OUTPUT, 0, "rfm69")?)?;
+    reset.set_low()?;
+
     // Configure SPI 8 bits, Mode 0
     let mut spi = SpidevDevice::open("/dev/spidev0.1")?;
     let options = SpidevOptions::new()
@@ -42,12 +49,12 @@ fn main() -> Result<()> {
         shaping: ModulationShaping::Shaping00,
     }))?;
     rfm_error!(rfm.packet(PacketConfig {
-        format: PacketFormat::Variable(10),
+        format: PacketFormat::Fixed(10),
         dc: PacketDc::None,
         filtering: PacketFiltering::None,
         crc: false,
         interpacket_rx_delay: InterPacketRxDelay::Delay2Bits,
-        auto_rx_restart: true,
+        auto_rx_restart: false,
     }))?;
     rfm_error!(rfm.dio_mapping(DioMapping {
         pin: DioPin::Dio2,
