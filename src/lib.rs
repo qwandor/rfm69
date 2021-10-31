@@ -389,7 +389,7 @@ where
 
     /// Check if IRQ flag PacketReady is set.
     pub fn is_packet_ready(&mut self) -> Result<bool, Ecs, Espi> {
-        let irq_flags_1 = self.read(Registers::IrqFlags2)?;
+        let irq_flags_1 = self.read(Registers::IrqFlags1)?;
         let irq_flags_2 = self.read(Registers::IrqFlags2)?;
         let rssi = self.read(Registers::RssiValue)? as f32 / -2.0;
         println!(
