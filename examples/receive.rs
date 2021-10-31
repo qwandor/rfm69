@@ -32,7 +32,7 @@ fn main() -> Result<()> {
     rfm_error!(rfm.sync(&[]))?;
 
     rfm_error!(rfm.modulation(Modulation {
-        data_mode: DataMode::Continuous,
+        data_mode: DataMode::Packet,
         modulation_type: ModulationType::Ook,
         shaping: ModulationShaping::Shaping00,
     }))?;
