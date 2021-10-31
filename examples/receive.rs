@@ -35,7 +35,7 @@ fn main() -> Result<()> {
 
     // Print content of all RFM registers
     for (index, val) in rfm_error!(rfm.read_all_regs())?.iter().enumerate() {
-        println!("Register 0x{:02x} = 0x{:02x}", index + 1, val);
+        //println!("Register 0x{:02x} = 0x{:02x}", index + 1, val);
     }
 
     rfm_error!(rfm.frequency(433_850_000.0))?;

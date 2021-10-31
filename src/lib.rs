@@ -394,10 +394,10 @@ where
         let irq_flags_1 = self.read(Registers::IrqFlags1)?;
         let irq_flags_2 = self.read(Registers::IrqFlags2)?;
         let rssi = self.read(Registers::RssiValue)? as f32 / -2.0;
-        println!(
+        /*println!(
             "irq_flags: {:#02x} {:#02x}, RSSI={}",
             irq_flags_1, irq_flags_2, rssi
-        );
+        );*/
         Ok(irq_flags_2 & 0x84 != 0)
     }
 
