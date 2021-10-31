@@ -1,20 +1,25 @@
 use anyhow::Result;
 use embedded_hal::digital::v2::OutputPin;
-use linux_embedded_hal::gpio_cdev::{Chip, LineRequestFlags};
 use linux_embedded_hal::spidev::{SpiModeFlags, SpidevOptions};
-use linux_embedded_hal::{CdevPin, Delay, Spidev};
+use linux_embedded_hal::sysfs_gpio::Direction;
+use linux_embedded_hal::{Delay, Spidev, SysfsPin};
 use rfm69::registers::{
     DataMode, DioMapping, DioMode, DioPin, DioType, InterPacketRxDelay, Modulation,
     ModulationShaping, ModulationType, PacketConfig, PacketDc, PacketFiltering, PacketFormat,
 };
+use std::time::Duration;
+use std::thread::sleep;
 use rfm69::Rfm69;
 use utilities::rfm_error;
 
 fn main() -> Result<()> {
-    let mut gpio = Chip::new("/dev/gpiochip0")?;
-    let mut reset = gpio.get_line(25)?;
-    let mut reset = CdevPin::new(reset.request(LineRequestFlags::OUTPUT, 0, "rfm69")?)?;
+    let mut reset = SysfsPin::new(25);
+    reset.export()?;
+    reset.set_direction(Direction::Low)?;
+    reset.set_high()?;
+    sleep(Duration::from_millis(1));
     reset.set_low()?;
+    sleep(Duration::from_millis(5));
 
     // Configure SPI 8 bits, Mode 0
     let mut spi = Spidev::open("/dev/spidev0.1")?;
