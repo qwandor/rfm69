@@ -203,7 +203,7 @@ where
     pub fn sync(&mut self, sync: &[u8]) -> Result<(), Ecs, Espi> {
         let len = sync.len();
         if len == 0 {
-            return self.update(Registers::SyncConfig, |r| r & 0x7f);
+            return self.update(Registers::SyncConfig, |r| (r & 0x7f) | 0x40);
         } else if len > 8 {
             return Err(Error::SyncSize);
         }
