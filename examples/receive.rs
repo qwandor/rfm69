@@ -26,8 +26,8 @@ fn main() -> Result<()> {
         println!("Register 0x{:02x} = 0x{:02x}", index + 1, val);
     }
 
-    rfm_error!(rfm.frequency(433_920_000.0))?;
-    rfm_error!(rfm.bit_rate(55_555.0))?;
+    rfm_error!(rfm.frequency(433_850_000.0))?;
+    rfm_error!(rfm.bit_rate(3_000.0))?;
     rfm_error!(rfm.preamble(0))?;
     rfm_error!(rfm.sync(&[]))?;
 
