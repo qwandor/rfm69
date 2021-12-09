@@ -4,9 +4,9 @@ use linux_embedded_hal::spidev::{SpiModeFlags, SpidevOptions};
 use linux_embedded_hal::sysfs_gpio::Direction;
 use linux_embedded_hal::{SpidevDevice, SysfsPin};
 use rfm69::registers::{
-    DataMode, DccCutoff, DioMapping, DioMode, DioPin, DioType, FifoMode, InterPacketRxDelay, Mode,
-    Modulation, ModulationShaping, ModulationType, PacketConfig, PacketDc, PacketFiltering,
-    PacketFormat, Registers, RxBw, RxBwOok,
+    DataMode, DccCutoff, DioMapping, DioMode, DioPin, DioType, FifoMode, InterPacketRxDelay,
+    LnaConfig, LnaGain, LnaImpedance, Mode, Modulation, ModulationShaping, ModulationType,
+    PacketConfig, PacketDc, PacketFiltering, PacketFormat, Registers, RxBw, RxBwOok,
 };
 use rfm69::Rfm69;
 use std::thread::sleep;
@@ -39,7 +39,10 @@ fn main() -> Result<()> {
     rfm_error!(rfm.bit_rate(sampling_rate))?;
     // TODO: Configure automatic frequency correction
     rfm_error!(rfm.rssi_threshold(175))?;
-    //rfm_error!(rfm.lna(0x88))?;
+    rfm_error!(rfm.lna(LnaConfig {
+        zin: LnaImpedance::Ohm200,
+        gain_select: LnaGain::AgcLoop,
+    }))?;
     rfm_error!(rfm.rx_bw(RxBw {
         dcc_cutoff: DccCutoff::Percent4,
         rx_bw: RxBwOok::Khz200dot0
