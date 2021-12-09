@@ -223,6 +223,14 @@ where
         Ok(())
     }
 
+    pub fn sample_rssi(&mut self) -> Result<f32, Ecs, Espi> {
+        self.write(Registers::RssiConfig, 0x01)?;
+        while self.read(Registers::RssiConfig)? == 0x00 {
+            std::thread::sleep(std::time::Duration::from_millis(1));
+        }
+        Ok(self.read(Registers::RssiValue)? as f32 / -2.0)
+    }
+
     /// Receive bytes from another RFM69. This call blocks until there are any
     /// bytes available. This can be combined with DIO interrupt for `SyncAddressMatch`, calling
     /// `recv_large` immediately after the interrupt will not block waiting for packets. It will
