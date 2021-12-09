@@ -34,15 +34,16 @@ fn main() -> Result<()> {
     // Create rfm struct with defaults that are set after reset
     let mut rfm = Rfm69::new_without_cs(spi, Delay);
 
+    let sampling_rate = 15_000.0; // in Hz
     rfm_error!(rfm.frequency(433_850_000.0))?;
-    rfm_error!(rfm.bit_rate(3_000.0))?;
+    rfm_error!(rfm.bit_rate(sampling_rate))?;
     // TODO: Configure automatic frequency correction
     rfm_error!(rfm.rssi_threshold(210))?;
     //rfm_error!(rfm.lna(0x88))?;
     //rfm_error!(rfm.rx_bw(0x55))?;
     //rfm_error!(rfm.rx_afc_bw(0x8b))?;
     rfm_error!(rfm.preamble(0))?;
-    rfm_error!(rfm.sync(&[0x8e]))?;
+    rfm_error!(rfm.sync(&[0x0f]))?;
     rfm_error!(rfm.fifo_mode(FifoMode::Level(2)))?;
 
     rfm_error!(rfm.modulation(Modulation {
