@@ -4,9 +4,9 @@ use linux_embedded_hal::spidev::{SpiModeFlags, SpidevOptions};
 use linux_embedded_hal::sysfs_gpio::Direction;
 use linux_embedded_hal::{SpidevDevice, SysfsPin};
 use rfm69::registers::{
-    DataMode, DioMapping, DioMode, DioPin, DioType, FifoMode, InterPacketRxDelay, Mode, Modulation,
-    ModulationShaping, ModulationType, PacketConfig, PacketDc, PacketFiltering, PacketFormat,
-    Registers,
+    DataMode, DccCutoff, DioMapping, DioMode, DioPin, DioType, FifoMode, InterPacketRxDelay, Mode,
+    Modulation, ModulationShaping, ModulationType, PacketConfig, PacketDc, PacketFiltering,
+    PacketFormat, Registers, RxBw, RxBwOok,
 };
 use rfm69::Rfm69;
 use std::thread::sleep;
@@ -38,9 +38,12 @@ fn main() -> Result<()> {
     rfm_error!(rfm.frequency(433_850_000))?;
     rfm_error!(rfm.bit_rate(sampling_rate))?;
     // TODO: Configure automatic frequency correction
-    rfm_error!(rfm.rssi_threshold(185))?;
+    rfm_error!(rfm.rssi_threshold(180))?;
     //rfm_error!(rfm.lna(0x88))?;
-    //rfm_error!(rfm.rx_bw(0x55))?;
+    rfm_error!(rfm.rx_bw(RxBw {
+        dcc_cutoff: DccCutoff::Percent4,
+        rx_bw: RxBwOok::Khz5dot2
+    }))?;
     //rfm_error!(rfm.rx_afc_bw(0x8b))?;
     rfm_error!(rfm.preamble(0))?;
     rfm_error!(rfm.sync(&[0x0f]))?;
