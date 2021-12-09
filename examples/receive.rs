@@ -38,7 +38,7 @@ fn main() -> Result<()> {
     rfm_error!(rfm.frequency(433_850_000.0))?;
     rfm_error!(rfm.bit_rate(sampling_rate))?;
     // TODO: Configure automatic frequency correction
-    rfm_error!(rfm.rssi_threshold(210))?;
+    rfm_error!(rfm.rssi_threshold(185))?;
     //rfm_error!(rfm.lna(0x88))?;
     //rfm_error!(rfm.rx_bw(0x55))?;
     //rfm_error!(rfm.rx_afc_bw(0x8b))?;
