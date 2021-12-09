@@ -73,6 +73,7 @@ fn main() -> Result<()> {
     rfm_error!(rfm.mode(Mode::Receiver))?;
     rfm_error!(rfm.wait_mode_ready())?;
     let mut zerocount = 0;
+    let mut pulse_measurer = PulseMeasurer::new((1_000_000.0 / sampling_rate) as u16);
     loop {
         //let irq_flags_1 = rfm_error!(rfm.read(Registers::IrqFlags1))?;
         let irq_flags_2 = rfm_error!(rfm.read(Registers::IrqFlags2))?;
@@ -83,21 +84,68 @@ fn main() -> Result<()> {
         );*/
         if irq_flags_2 & 0x20 != 0 {
             let val = rfm_error!(rfm.read(Registers::Fifo))?;
+            pulse_measurer.add_bits(val);
             if val == 0 {
                 zerocount += 1;
             } else {
                 if zerocount > 0 {
-                    println!("00*{}", zerocount);
                     if zerocount >= 3 {
                         break;
                     }
                     zerocount = 0;
                 }
-                print!("{:02x} ", val);
             }
         }
     }
     println!();
 
     Ok(())
+}
+
+struct PulseMeasurer {
+    /// Sample duration in microseconds.
+    sample_duration: u16,
+    /// Whether the current pulse is high or low.
+    current_level: bool,
+    /// The number of samples in the curren pulse so far.
+    pulse_sample_count: u16,
+}
+
+impl PulseMeasurer {
+    pub fn new(sample_duration: u16) -> Self {
+        Self {
+            sample_duration,
+            current_level: false,
+            pulse_sample_count: 0,
+        }
+    }
+
+    pub fn add_bit(&mut self, bit: bool) {
+        if bit == self.current_level {
+            self.pulse_sample_count += 1;
+        } else {
+            self.finish();
+            self.current_level = bit;
+            self.pulse_sample_count = 1;
+        }
+    }
+
+    pub fn add_bits(&mut self, byte: u8) {
+        for i in 0..8 {
+            let bit = byte & (0x80 >> i) != 0;
+            self.add_bit(bit);
+        }
+    }
+
+    pub fn finish(&mut self) {
+        if self.pulse_sample_count > 0 {
+            println!(
+                "{} {} ({} uS)",
+                self.pulse_sample_count,
+                self.current_level,
+                self.pulse_sample_count * self.sample_duration,
+            );
+        }
+        self.pulse_sample_count = 0;
+    }
 }
