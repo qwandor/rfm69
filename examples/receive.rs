@@ -38,6 +38,7 @@ fn main() -> Result<()> {
     rfm_error!(rfm.frequency(433_850_000.0))?;
     rfm_error!(rfm.bit_rate(sampling_rate))?;
     // TODO: Configure automatic frequency correction
+    // Actual RSSI threshold is -N/2.
     rfm_error!(rfm.rssi_threshold(175))?;
     rfm_error!(rfm.lna(LnaConfig {
         zin: LnaImpedance::Ohm200,
