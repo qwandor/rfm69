@@ -39,7 +39,7 @@ fn main() -> Result<()> {
     rfm_error!(rfm.bit_rate(sampling_rate))?;
     // TODO: Configure automatic frequency correction
     // Actual RSSI threshold is -N/2.
-    rfm_error!(rfm.rssi_threshold(175))?;
+    rfm_error!(rfm.rssi_threshold(190))?;
     rfm_error!(rfm.lna(LnaConfig {
         zin: LnaImpedance::Ohm200,
         gain_select: LnaGain::AgcLoop,
@@ -89,9 +89,11 @@ fn main() -> Result<()> {
             "irq_flags: {:#02x} {:#02x}, RSSI={}",
             irq_flags_1, irq_flags_2, rssi
         );*/
+        println!("RSSI: {}", rfm_error!(rfm.sample_rssi())?);
+        std::thread::sleep(std::time::Duration::from_millis(100));
         if irq_flags_2 & 0x20 != 0 {
             let val = rfm_error!(rfm.read(Registers::Fifo))?;
-            pulse_measurer.add_bits(val);
+            //pulse_measurer.add_bits(val);
             if val == 0 {
                 zerocount += 1;
             } else {
