@@ -40,6 +40,7 @@ fn main() -> Result<()> {
     // TODO: Configure automatic frequency correction
     // Actual RSSI threshold is -N/2.
     rfm_error!(rfm.rssi_threshold(175))?;
+    // TODO: Try adjusting OOK threshold.
     rfm_error!(rfm.lna(LnaConfig {
         zin: LnaImpedance::Ohm200,
         gain_select: LnaGain::AgcLoop,
