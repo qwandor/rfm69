@@ -81,7 +81,7 @@ fn main() -> Result<()> {
     rfm_error!(rfm.mode(Mode::Receiver))?;
     while !rfm_error!(rfm.is_mode_ready())? {}
     let mut zerocount = 0;
-    let mut pulse_measurer = PulseMeasurer::new((1_000_000.0 / sampling_rate) as u16);
+    let mut pulse_measurer = PulseMeasurer::new((1_000_000 / sampling_rate) as u16);
     loop {
         //let irq_flags_1 = rfm_error!(rfm.read(Registers::IrqFlags1))?;
         let irq_flags_2 = rfm_error!(rfm.read(Registers::IrqFlags2))?;

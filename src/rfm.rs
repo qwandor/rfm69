@@ -223,7 +223,7 @@ where
         Ok(())
     }
 
-    pub fn sample_rssi(&mut self) -> Result<f32, Ecs, Espi> {
+    pub fn sample_rssi(&mut self) -> Result<f32, Espi> {
         self.write(Registers::RssiConfig, 0x01)?;
         while self.read(Registers::RssiConfig)? == 0x00 {
             std::thread::sleep(std::time::Duration::from_millis(1));
